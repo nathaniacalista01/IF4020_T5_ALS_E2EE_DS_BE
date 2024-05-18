@@ -54,9 +54,7 @@ class App {
       socket.emit("publicKey", this.publicKey.toString("hex"));
 
       socket.on("clientPublicKey", (clientPublicKeyHex) => {
-        console.log(clientPublicKeyHex)
         const clientPublicKey = Buffer.from(clientPublicKeyHex, "hex");
-        console.log(clientPublicKey)
         const sharedSecret = this.ecdh.computeSecret(clientPublicKey);
         console.log(
           "Shared secret computed by server :",
