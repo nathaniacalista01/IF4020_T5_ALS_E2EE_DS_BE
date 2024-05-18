@@ -5,6 +5,7 @@ import cors from "cors";
 import { Server as SocketIO } from "socket.io";
 import router from "./routes"; // Assuming routes are properly defined in this import.
 import crypto, { ECDH } from "crypto";
+import { MessageService } from "./services/message-service";
 
 class App {
   private server: Express;
@@ -12,6 +13,7 @@ class App {
   private io: SocketIO;
   private ecdh: ECDH;
   private publicKey: Buffer;
+  private messageService: MessageService;
   constructor() {
     this.server = express();
     this.server.use(express.json());
@@ -36,8 +38,9 @@ class App {
       },
     });
     this.ecdh = crypto.createECDH("secp256k1");
-    this.ecdh.generateKeys()
+    this.ecdh.generateKeys();
     this.publicKey = this.ecdh.getPublicKey();
+    this.messageService = new MessageService();
     this.setUpSocket();
   }
 
@@ -60,6 +63,11 @@ class App {
           "Shared secret computed by server :",
           sharedSecret.toString("hex")
         );
+      });
+
+      socket.on("sendMessage", (message) => {
+        console.log("Get message from client : ", message);
+        this.messageService.addMessage(message);
       });
 
       socket.on("disconnect", () => {
