@@ -4,7 +4,6 @@ import { keyMiddleware } from "../middleware/middleware";
 
 const router = express.Router();
 router.post("/", keyMiddleware, (req: Request, res: Response) => {});
-
 router.use("/auth", authRouter);
 
 export default router;
