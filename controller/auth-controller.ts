@@ -25,7 +25,8 @@ authRouter.post("/login", async (req: Request, res: Response) => {
       res.send("Wrong password!").status(401);
       break;
     default:
-      res.send("Login successful!").status(200);
+      const {passwordHash, ...userWithoutPasswordHash} = result;
+      res.send(userWithoutPasswordHash).status(200);
       break;
   }
 });
