@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  rest_db:
+    container_name: rest-db
+    build:
+      context: .
+      dockerfile: dockerfile/Dockerfile.postgres
+    ports:
+      - "5432:5432"
+    env_file:
+      - docker.env
+    volumes:
+      - rest-pg-data:/var/lib/postgresql/data
+
+volumes:
+  rest-pg-data:
