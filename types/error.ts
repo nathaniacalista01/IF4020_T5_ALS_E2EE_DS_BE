@@ -9,4 +9,5 @@ export enum Error {
   INTERNAL_ERROR = "Internal server error",
   PAGE_NOT_FOUND = "Page not found",
   MDOULE_NOT_FOUND = "Module not found!",
+  INVALID_UUID = "Invalid UUID"
 }
