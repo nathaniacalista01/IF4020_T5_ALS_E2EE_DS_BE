@@ -16,7 +16,7 @@ export const keyMiddleware = (
   }
   if (clientKeys.has(clientPort)) {
     console.log("Key already exist!");
-    res.status(400).send("Key already exists");
+    res.status(201).send("Key already exists");
     return;
   } else {
     const serverPublicKey = generateSharedKey(clientPort, clientPublicKey);
