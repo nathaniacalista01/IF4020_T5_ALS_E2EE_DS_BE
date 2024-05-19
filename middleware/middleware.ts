@@ -20,7 +20,7 @@ export const keyMiddleware = (
     return;
   } else {
     const serverPublicKey = generateSharedKey(clientPort, clientPublicKey);
-    res.status(200).send(serverPublicKey); // Ensure correct encoding
+    res.status(200).send(serverPublicKey);
     return;
   }
 };
