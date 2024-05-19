@@ -1,5 +1,6 @@
 import { Point } from "../type/point";
-import { calculateGradient, generatePrimeNumber, getRandomNumber } from "../utils/number"
+import { calculateGradient } from "../utils/functions";
+import { generatePrimeNumber, getRandomNumber } from "../utils/number"
 
 
 export class ECDH {
@@ -25,6 +26,14 @@ export class ECDH {
     this.bVal = b;
   }
 
+  public calculateY = (x: number) : number => {
+    return Math.sqrt(Math.pow(x, 3) + this.aVal*x + this.bVal);
+  }
+
+  public checkEquation = (x: number, y: number) : boolean => {
+    return this.calculateY(x) === y;
+  }
+
   public calculateCoorX = (p1: Point, p2: Point) => {
     const m = calculateGradient(p1, p2)
     return Math.pow(m, 2) - p1.x - p2.x
@@ -41,5 +50,14 @@ export class ECDH {
     const y = this.calculateCoorY(p1, p2)
     return new Point(x, y)
   }
-  
+
+  public multiplyPoint = (n : number, p : Point) : Point => {
+    var tempPoint = new Point(0,0)
+    tempPoint.copyPoint(p);
+    for (var i = 0; i < n; i++){
+      tempPoint = this.addPoint(tempPoint, p);
+    }
+    return tempPoint
+  }
 }
+  

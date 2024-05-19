@@ -13,6 +13,3 @@ export const getRandomNumber = (max : number) => {
   return Math.floor( Math.random() * max)
 }
 
-export const calculateGradient = (p1 :Point, p2: Point) =>{
-  return ((p2.y - p1.y)/ (p2.x - p1.x))
-}
