@@ -41,7 +41,7 @@ class App {
     this.ecdh.generateKeys();
     this.publicKey = this.ecdh.getPublicKey();
     this.messageService = new MessageService();
-    this.setUpSocket();
+    // this.setUpSocket();
   }
 
   public run() {
