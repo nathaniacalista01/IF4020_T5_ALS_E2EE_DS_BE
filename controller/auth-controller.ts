@@ -1,9 +1,10 @@
-import express, { Request, Response, response } from "express";
+import express, { Request, Response } from "express";
 import { AuthService } from "../services/auth-service";
 import { Error } from "../types/error";
 
 export const authRouter = express.Router();
 const authService = new AuthService();
+
 authRouter.post("/register", async (req: Request, res: Response) => {
   const { username, name, password } = req.body;
   const result = await authService.register(username, name, password);
@@ -15,7 +16,6 @@ authRouter.post("/register", async (req: Request, res: Response) => {
 
 authRouter.post("/login", async (req: Request, res: Response) => {
   const { username, password } = req.body;
-  console.log(username, password)
   const result = await authService.login(username, password);
   switch (result) {
     case Error.USER_NOT_FOUND:

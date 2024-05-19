@@ -1,16 +1,13 @@
-import { PrismaClient } from "@prisma/client";
 import { UserService } from "./user-service";
 import { DB } from "../db/db";
 import bcrypt from "bcrypt";
 import { Error } from "../types/error";
 
 export class AuthService {
-  private prisma: PrismaClient;
   private user: UserService;
 
   constructor() {
     const db: DB = DB.getInstance();
-    this.prisma = db.prisma;
     this.user = new UserService();
   }
 
