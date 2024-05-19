@@ -2,7 +2,7 @@ import { Point } from "../type/point"
 
 export const calculateGradient = (p1 :Point, p2: Point, pVal: number) : number =>{
   // return ((p2.y - p1.y)/ (p2.x - p1.x))
-  return (p2.y = p1.y) * modInverse(p2.x - p1.x, pVal)
+  return (p2.y - p1.y) * modInverse(p2.x - p1.x, pVal)
 }
 
 export const calculateGradientHomogenous = (p: Point, aVal : number, pVal: number) : number => {
@@ -50,5 +50,7 @@ function modInverse(a: number, m: number): number {
   }
 
   // x might be negative, so we take it modulo m to get the positive equivalent
-  return (x % m + m) % m;
+  var res = (x % m + m) % m
+  console.log("Mod inverse " + res)
+  return res;
 }
