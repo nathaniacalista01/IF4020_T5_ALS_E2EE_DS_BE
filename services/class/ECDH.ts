@@ -1,5 +1,6 @@
 import { Point } from "../type/point";
-import { calculateGradient, generatePrimeNumber, getRandomNumber } from "../utils/number"
+import { calculateGradient } from "../utils/functions";
+import { generatePrimeNumber, getRandomNumber } from "../utils/number"
 
 
 export class ECDH {
