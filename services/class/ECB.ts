@@ -1,4 +1,3 @@
-import { ECDH } from "crypto";
 import { operatorXOR } from "../utils/functions";
 
 const BLOCK_SIZE = 16; // 128 bits = 16 bytes
@@ -124,4 +123,6 @@ class ECB {
       throw new Error("Cipher text is empty!")
     }
   }
+
+
 }
