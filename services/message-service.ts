@@ -11,7 +11,7 @@ export class MessageService {
     this.prisma = db.prisma;
   }
 
-  public async addMessage(senderId: string, receiverId: string, message: string) {
+  public async addMessage(senderId: string, receiverId: string, roomChatId: number, message: string) {
     if (!isUUID(senderId)) {
       console.error(`Invalid UUID for senderId: ${senderId}`);
       throw new Error(`Invalid UUID for senderId: ${senderId}`);
@@ -45,6 +45,7 @@ export class MessageService {
         data: {
           senderId,
           receiverId,
+          roomChatId,
           hashedMessage: message,
         },
       });

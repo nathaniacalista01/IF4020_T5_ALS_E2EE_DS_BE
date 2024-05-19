@@ -7,47 +7,31 @@ import { JoinRoomPayload, SendMessagePayload } from "../types/socket";
 let waitingQueue: { socket: Socket, userId: string }[] = [];
 
 export const socketController = (io: Server, socket: Socket) => {
-    const messageService = new MessageService();
-    const roomchatService = new RoomchatService();
-  
-    socket.on("joinQueue", async ({ userId }: { userId: string }) => {
-        console.log("Client joined the queue:", socket.id);
-    
-        const alreadyInQueue = waitingQueue.some(client => client.userId === userId);
-        if (alreadyInQueue) {
-          console.log(`User ${userId} is already in the queue.`);
-          socket.emit('error', 'You are already in the queue.');
-          return;
-        }
-    
-        waitingQueue.push({ socket, userId });
-    
-        if (waitingQueue.length >= 2) {
-          const [client1, client2] = waitingQueue.splice(0, 2);
-    
-          const roomchat = await roomchatService.createRoomchat(client1.userId, client2.userId);
-    
-          if (roomchat === Error.INTERNAL_ERROR) {
-            console.error('Error creating room');
-            client1.socket.emit('error', 'Error creating room');
-            client2.socket.emit('error', 'Error creating room');
-            return;
-          }
-    
-          const roomId = roomchat.id;
-          client1.socket.join(roomId.toString());
-          client2.socket.join(roomId.toString());
-    
-          client1.socket.data = { receiverId: client2.userId, roomId: roomId.toString() };
-          client2.socket.data = { receiverId: client1.userId, roomId: roomId.toString() };
-    
-          client1.socket.emit("matched", { roomId, receiverId: client2.userId });
-          client2.socket.emit("matched", { roomId, receiverId: client1.userId });
+  const messageService = new MessageService();
+  const roomchatService = new RoomchatService();
 
-          console.log("Ciee match <3");
-          console.log(`Room ${roomId} created and clients added:`, client1.socket.id, client2.socket.id);
-        }
-      });
+  socket.on("joinQueue", async ({ userId }: { userId: string }) => {
+    console.log("Client joined the queue:", socket.id);
+
+    waitingQueue.push({ socket, userId });
+
+    if (waitingQueue.length >= 2) {
+      const [client1, client2] = waitingQueue.splice(0, 2);
+
+      const room = await roomchatService.createRoomchat(client1.userId, client2.userId);
+      if (room !== Error.INTERNAL_ERROR) {
+        const roomId = room.id;
+        client1.socket.join(roomId.toString());
+        client2.socket.join(roomId.toString());
+
+        client1.socket.emit("matched", { roomId, receiverId: client2.userId });
+        client2.socket.emit("matched", { roomId, receiverId: client1.userId });
+
+        console.log("Ciee match <3");
+        console.log(`Room ${roomId} created and clients added:`, client1.socket.id, client2.socket.id);
+      }
+    }
+  });
 
   socket.on("joinRoom", async (payload: JoinRoomPayload) => {
     const { roomId } = payload;
@@ -87,7 +71,7 @@ export const socketController = (io: Server, socket: Socket) => {
       return;
     }
 
-    const response = await messageService.addMessage(senderId, receiverId, message);
+    const response = await messageService.addMessage(senderId, receiverId, Number(roomId), message);
 
     if (response !== Error.INTERNAL_ERROR) {
       io.to(roomId.toString()).emit("receiveMessage", response);
