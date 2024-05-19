@@ -8,8 +8,15 @@ export class Point {
     this.y = y
   }
 
-  setPoint = (p : Point) => {
+  setValue = (x: number, y: number) => {
+    this.x = x 
+    this.y = y
+  }
+
+  copyPoint = (p : Point) => {
     this.x = p.x
     this.y = p.y
   }
+
+
 }
