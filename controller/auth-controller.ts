@@ -1,4 +1,4 @@
-import express, { Request, Response, response } from "express";
+import express, { Request, Response } from "express";
 import { AuthService } from "../services/auth-service";
 import { Error } from "../types/error";
 
