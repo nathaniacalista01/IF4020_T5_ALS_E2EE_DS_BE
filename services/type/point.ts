@@ -18,5 +18,9 @@ export class Point {
     this.y = p.y
   }
 
+  isSamePoint = (p : Point) => {
+    return this.x === p.x && this.y === p.y
+  }
+
 
 }
