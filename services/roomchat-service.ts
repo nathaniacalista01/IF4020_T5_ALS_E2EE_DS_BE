@@ -60,6 +60,21 @@ export class RoomchatService {
     }
   }
 
+  public async getRoomchatIdsByUserId(userId: string): Promise<number[] | Error.INTERNAL_ERROR> {
+    try {
+      const roomchats = await this.prisma.roomChat.findMany({
+        where: {
+          OR: [{ firstUserId: userId }, { secondUserId: userId }],
+        },
+        select: { id: true },
+      });
+      return roomchats.map(room => room.id);
+    } catch (error) {
+      console.error('Error fetching room chat IDs by user ID:', error);
+      return Error.INTERNAL_ERROR;
+    }
+  }
+
   public async deleteRoomchat(roomId: number): Promise<boolean | Error.INTERNAL_ERROR> {
     try {
       await this.prisma.roomChat.delete({
