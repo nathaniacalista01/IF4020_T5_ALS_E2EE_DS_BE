@@ -2,7 +2,7 @@ import { Server, Socket } from "socket.io";
 import { RoomchatService } from "../services/roomchat-service";
 import { MessageService } from "../services/message-service";
 import { Error } from "../types/error";
-import { JoinRoomPayload, SendMessagePayload } from "../types/socket";
+import { DeleteRoomChatPayload, JoinRoomPayload, SendMessagePayload } from "../types/socket";
 
 let waitingQueue: { socket: Socket, userId: string, chatroomId: number }[] = [];
 let waitingQueueRealtime: { socket: Socket, userId: string }[] = [];
@@ -193,5 +193,36 @@ export const socketController = (io: Server, socket: Socket) => {
     }
 
     console.log("Updated waiting queue and room participants after disconnect");
+  });
+
+  socket.on("deleteChatroom", async ( payload: DeleteRoomChatPayload ) => {
+    const { chatroomId } = payload
+    const roomId = Number(chatroomId)
+    const room = await roomchatService.getRoomchatById(roomId);
+    if (room === Error.INTERNAL_ERROR || !room) {
+      socket.emit('error', 'Error fetching room or room not found');
+      return;
+    }
+
+    const participants = roomParticipants[roomId];
+    if (participants) {
+      participants.forEach(participantId => {
+        const participantSocket = io.sockets.sockets.get(participantId);
+        if (participantSocket) {
+          participantSocket.leave(chatroomId.toString());
+          participantSocket.emit('kicked', `Room ${chatroomId} has been deleted`);
+        }
+      });
+      delete roomParticipants[roomId];
+    }
+
+    const result = await roomchatService.deleteRoomchat(roomId);
+    if (result === Error.INTERNAL_ERROR) {
+      socket.emit('error', 'Error deleting room');
+      return;
+    }
+
+    console.log(`Room ${chatroomId} deleted successfully`);
+    io.emit('chatroomDeleted', chatroomId);
   });
 };

@@ -59,4 +59,16 @@ export class RoomchatService {
       return Error.INTERNAL_ERROR;
     }
   }
+
+  public async deleteRoomchat(roomId: number): Promise<boolean | Error.INTERNAL_ERROR> {
+    try {
+      await this.prisma.roomChat.delete({
+        where: { id: roomId },
+      });
+      return true;
+    } catch (error) {
+      console.error('Error deleting room chat:', error);
+      return Error.INTERNAL_ERROR;
+    }
+  }
 }
