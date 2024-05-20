@@ -22,5 +22,8 @@ export class Point {
     return this.x === p.x && this.y === p.y
   }
 
+  isInverse = (p : Point, pVal: number) => {
+    return this.x === p.x && this.y === Math.abs(pVal -p.y)
+  }
 
 }
