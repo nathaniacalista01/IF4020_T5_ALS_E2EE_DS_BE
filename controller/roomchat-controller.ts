@@ -15,6 +15,16 @@ roomchatRouter.get("/:user_id", async (req: Request, res: Response) => {
   }
 });
 
+roomchatRouter.get("/:user_id/ids", async (req: Request, res: Response) => {
+  const {user_id} = req.params;
+  const roomChatIds = await roomchatService.getRoomchatIdsByUserId(user_id);
+  if (roomChatIds === Error.INTERNAL_ERROR) {
+    res.status(500).send("Internal server error");
+  } else {
+    res.status(200).send(roomChatIds);
+  }
+});
+
 roomchatRouter.post("/", async (req: Request, res: Response) => {
   const { firstUserId, secondUserId } = req.body;
   const result = await roomchatService.createRoomchat(firstUserId, secondUserId);

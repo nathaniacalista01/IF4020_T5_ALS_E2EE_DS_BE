@@ -9,3 +9,7 @@ export interface SendMessagePayload {
     message: string;
 }
   
+
+export interface DeleteRoomChatPayload {
+    chatroomId: string;
+}
