@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import clientKeys from "../global";
 import { generateSharedKey } from "../utils/key-generator";
-import { decryptData } from '../services/utils/decrypt';
+import { decryptECB } from "../services/utils/crypt/ecb";
+import { makeBlocksArrayToString, makeStringToBlocksArray } from "../services/utils/crypt/process";
 
 export const keyMiddleware = (
   req: Request,
@@ -41,9 +42,9 @@ export const decryptionMiddleware = (req: Request, res: Response, next: NextFunc
   try {
     const key = clientKeys.get(clientPort);
     const encryptedData = Buffer.from(req.body.encrypted, 'base64').toString('utf8');
-    const decryptedBody = decryptData(encryptedData, "");
-    req.body = JSON.parse(decryptedBody);
-    console.log(req.body)
+    const decryptedBody = decryptECB(makeStringToBlocksArray(encryptedData, false), "");
+    const decryptedStringBody = makeBlocksArrayToString(decryptedBody);
+    req.body = JSON.parse(decryptedStringBody);
     next();
 
   } catch (error) {
