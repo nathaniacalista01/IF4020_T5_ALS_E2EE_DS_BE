@@ -1,13 +1,24 @@
 import { Point } from "../type/point"
 
-export const calculateGradient = (p1 :Point, p2: Point, pVal: number) : number =>{
-  // return ((p2.y - p1.y)/ (p2.x - p1.x))
-  return (p2.y - p1.y) * modInverse(p2.x - p1.x, pVal)!
+export const calculateGradient = (p1 :Point, p2: Point, pVal: number) : number | null=>{
+  var m = modInverse(p2.x - p1.x, pVal)
+  if (m){
+    return positiveModulo((p2.y - p1.y) * m, pVal)
+  } else {
+    console.log("Null Mod Result. P1: (", p1.x, ", ", p1.y,") | P2: (", p2.x,", ", p2.y,")")
+    return null
+  }
+  
 }
 
-export const calculateGradientHomogenous = (p: Point, aVal : number, pVal: number) : number => {
-  // return (3*Math.pow(p.x, 2) + aVal) / (2 * p.y)
-  return (3*Math.pow(p.x, 2) + aVal) * modInverse(2 *p.y, pVal)!
+export const calculateGradientHomogenous = (p: Point, aVal : number, pVal: number) : number | null => {
+  var m = modInverse(2 *p.y, pVal)
+  if (m) {
+    return positiveModulo((3*Math.pow(p.x, 2) + aVal) * m, pVal)
+  } else {
+    console.log("Null Mod Result. P: (", p.x, ", ", p.y,")")
+    return null
+  }
 }
 
 export const operatorXOR = (block1: string, block2: string): string => {
@@ -43,7 +54,7 @@ function gcd(a: number, b: number): number {
 function modInverse(a: number, m: number): number | null {
   a = positiveModulo(a, m);
   if (gcd(a, m) != 1){
-    console.log("The number is not invertible. Number A:", a)
+    console.log("The number is not invertible.")
     return null
   }
 

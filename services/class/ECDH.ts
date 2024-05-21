@@ -27,7 +27,9 @@ export class ECDH {
 
     for( var i = 0; i < this.pVal-1; i++){
       var res = this.calculateY(i);
-      if (res % 1 == 0){
+      var selection1 = res % 1 == 0 // the value should be an integer
+      var selection2 = (res > 0 && res < this.pVal) // [1...pVal-1]
+      if (selection1 && selection2){
         this.points.push(new Point(i, res))
         this.points.push(new Point(i, this.pVal - res))
       }
@@ -50,13 +52,13 @@ export class ECDH {
 
   public calculateCoorX = (p1: Point, p2: Point) => {
     var m = p1.isSamePoint(p2) ? calculateGradientHomogenous(p1, this.aVal, this.pVal) : calculateGradient(p1, p2, this.pVal)
-    return positiveModulo((Math.pow(m, 2) - p1.x - p2.x), this.pVal)
+    return positiveModulo((Math.pow(m!, 2) - p1.x - p2.x), this.pVal)
   }
 
   public calculateCoorY = (p1: Point, p2: Point) => {
     var m = p1.isSamePoint(p2) ? calculateGradientHomogenous(p1, this.aVal, this.pVal) : calculateGradient(p1, p2, this.pVal)
     const xR = this.calculateCoorX(p1, p2)
-    return positiveModulo((m * (p1.x - xR) - p1.y), this.pVal)
+    return positiveModulo((m! * (p1.x - xR) - p1.y), this.pVal)
   }
 
   public addPoint = (p1: Point, p2: Point) => {
@@ -70,14 +72,19 @@ export class ECDH {
     } else if (p2.isSamePoint(INFINITY_POINT)){
       return p1
     }
-
     if (p1.isSamePoint(p2) && p1.y == 0){
       return INFINITY_POINT
     }
 
     const x = this.calculateCoorX(p1, p2)
     const y = this.calculateCoorY(p1, p2)
-    // console.log(this.checkEquation(x, y));
+    // if (!this.checkEquation(x,y)){
+    //   console.log("FALSE")
+    //   console.log("x: ", x, "| after mod:", positiveModulo((Math.pow(x, 3) + this.aVal*x + this.bVal), this.pVal))
+    //   console.log("y: ", y, "| after mod:", positiveModulo(Math.pow(y,2), this.pVal))
+    // } else {
+    //   console.log("TRUE")
+    // }
     return new Point(x, y)
   }
 
@@ -109,8 +116,10 @@ console.log("a: "+temp.aVal+" b: "+temp.bVal +" p: "+temp.pVal)
 
 var p1 = temp.points[temp.getRandomPoint()]
 
-var aPrivKey = 50;
-var bPrivKey = 25;
+// console.log("TEMP POINT", p1)
+
+var aPrivKey = generatePrimeNumber();
+var bPrivKey = generatePrimeNumber();
 
 var aPubKey = temp.multiplyPoint(p1, aPrivKey);
 var bPubKey = temp.multiplyPoint(p1, bPrivKey);
@@ -118,8 +127,8 @@ var bPubKey = temp.multiplyPoint(p1, bPrivKey);
 console.log("A PUBLIC KEY", aPubKey)
 console.log("B PUBLIC KEY", bPubKey)
 
-var aSharedKey = temp.multiplyPoint(aPubKey, 25);
-var bSharedKey = temp.multiplyPoint(bPubKey, 50);
+var aSharedKey = temp.multiplyPoint(aPubKey, bPrivKey);
+var bSharedKey = temp.multiplyPoint(bPubKey, aPrivKey);
 
 console.log("A SHARED KEY", aSharedKey)
 console.log("B SHARED KEY", bSharedKey)
