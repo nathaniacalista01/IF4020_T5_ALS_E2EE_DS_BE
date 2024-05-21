@@ -18,8 +18,8 @@ export const makeBlocksArrayToString = (blocks: Array<string>) => {
   let string = ''
   for (let i = 0; i < blocks.length; i++) {
     const block = blocks[i]
-    for (let i = 0; i < block.length; i += BYTE_SIZE) {
-      const charBinary = block.slice(i, i + BYTE_SIZE)
+    for (let j = 0; j < block.length; j += BYTE_SIZE) {
+      const charBinary = block.slice(j, j + BYTE_SIZE)
       const char = String.fromCharCode(parseInt(charBinary, 2))
       string += char
     }
@@ -28,7 +28,7 @@ export const makeBlocksArrayToString = (blocks: Array<string>) => {
 }
 
 export const adjustKey = (key: string) => {
-  if (key.length == KEY_BLOCK_SIZE) {
+  if (key.length === KEY_BLOCK_SIZE) {
     return key
   } else if (key.length < KEY_BLOCK_SIZE) {
     return key.padEnd(KEY_BLOCK_SIZE, '0')

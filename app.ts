@@ -4,7 +4,6 @@ import http from "http";
 import cors from "cors";
 import router from "./routes";
 import { initializeSocket } from "./utils/socket-utils";
-import { decryptionMiddleware } from "./middleware/middleware";
 dotenv.config();
 
 class App {
@@ -21,9 +20,6 @@ class App {
         credentials: false,
       })
     );
-
-    // Enable this later
-    // this.server.use(decryptionMiddleware);
 
     this.server.use("/api", router);
 
