@@ -25,6 +25,18 @@ roomchatRouter.get("/:user_id/ids", async (req: Request, res: Response) => {
   }
 });
 
+roomchatRouter.get("/:chatroom_id/messages", async (req: Request, res: Response) => {
+  const { chatroom_id } = req.params;
+  const chatroom = await roomchatService.getRoomchatById(Number(chatroom_id));
+  if (chatroom === Error.INTERNAL_ERROR) {
+    res.status(500).send("Internal server error");
+  } else if (!chatroom) {
+    res.status(404).send("Chatroom not found");
+  } else {
+    res.status(200).send(chatroom.messages);
+  }
+});
+
 roomchatRouter.post("/", async (req: Request, res: Response) => {
   const { firstUserId, secondUserId } = req.body;
   const result = await roomchatService.createRoomchat(firstUserId, secondUserId);
