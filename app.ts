@@ -23,7 +23,7 @@ class App {
     );
 
     // Enable this later
-    this.server.use(decryptionMiddleware);
+    // this.server.use(decryptionMiddleware);
 
     this.server.use("/api", router);
 
