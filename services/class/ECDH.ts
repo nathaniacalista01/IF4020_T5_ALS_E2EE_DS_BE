@@ -2,6 +2,7 @@ import { Point } from "../type/point";
 import { calculateGradient, calculateGradientHomogenous, isSquare, positiveModulo } from "../utils/functions";
 import { generatePrimeNumber, getRandomNumber } from "../utils/number"
 
+const INFINITY_POINT = new Point(Infinity, Infinity)
 
 export class ECDH {
   public aVal : number
@@ -44,7 +45,7 @@ export class ECDH {
   }
 
   public checkEquation = (x: number, y: number) : boolean => {
-    return this.calculateY(x) === y;
+    return positiveModulo((Math.pow(x, 3) + this.aVal*x + this.bVal), this.pVal) === positiveModulo(Math.pow(y,2), this.pVal);
   }
 
   public calculateCoorX = (p1: Point, p2: Point) => {
@@ -59,13 +60,28 @@ export class ECDH {
   }
 
   public addPoint = (p1: Point, p2: Point) => {
+
+    // Handle cases
+    if (p1.isInverse(p2, this.pVal)){
+      return INFINITY_POINT
+    }
+    if (p1.isSamePoint(INFINITY_POINT)){
+      return p2
+    } else if (p2.isSamePoint(INFINITY_POINT)){
+      return p1
+    }
+
+    if (p1.isSamePoint(p2) && p1.y == 0){
+      return INFINITY_POINT
+    }
+
     const x = this.calculateCoorX(p1, p2)
     const y = this.calculateCoorY(p1, p2)
-    console.log(this.checkEquation(x, y));
+    // console.log(this.checkEquation(x, y));
     return new Point(x, y)
   }
 
-  public multiplyPoint = (n : number, p : Point) : Point => {
+  public multiplyPoint = (p : Point, n : number) : Point => {
     var tempPoint = new Point(0,0)
     tempPoint.copyPoint(p);
     for (var i = 0; i < n; i++){
@@ -90,10 +106,26 @@ export class ECDH {
 
 var temp = new ECDH()
 console.log("a: "+temp.aVal+" b: "+temp.bVal +" p: "+temp.pVal)
+
 var p1 = temp.points[temp.getRandomPoint()]
-console.log(p1)
-var p2 = temp.points[temp.getRandomPoint()]
-console.log(p2)
-var p3 = temp.addPoint(p1, p2);
-console.log(p3)
-console.log(temp.searchPoint(p3))
+
+var aPrivKey = 50;
+var bPrivKey = 25;
+
+var aPubKey = temp.multiplyPoint(p1, aPrivKey);
+var bPubKey = temp.multiplyPoint(p1, bPrivKey);
+
+console.log("A PUBLIC KEY", aPubKey)
+console.log("B PUBLIC KEY", bPubKey)
+
+var aSharedKey = temp.multiplyPoint(aPubKey, 25);
+var bSharedKey = temp.multiplyPoint(bPubKey, 50);
+
+console.log("A SHARED KEY", aSharedKey)
+console.log("B SHARED KEY", bSharedKey)
+
+if (aSharedKey.isSamePoint(bSharedKey)){
+  console.log("BISAAA SAMA AAWOOAWOAWO")
+}
+
+
