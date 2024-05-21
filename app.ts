@@ -5,6 +5,7 @@ import cors from "cors";
 // import { Server as SocketIO } from "socket.io";
 import router from "./routes";
 import { initializeSocket } from "./utils/socket-utils";
+import { decryptionMiddleware } from "./middleware/middleware";
 // import crypto, { ECDH } from "crypto";
 // import { MessageService } from "./services/message-service";
 
@@ -27,6 +28,8 @@ class App {
         credentials: false,
       })
     );
+
+    this.server.use(decryptionMiddleware);
 
     this.server.use("/api", router);
 
