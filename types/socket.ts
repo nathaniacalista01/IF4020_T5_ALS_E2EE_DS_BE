@@ -3,6 +3,8 @@ export interface SendMessagePayload {
     senderId: string;
     receiverId: string;
     message: string;
+    isSigned: boolean;
+    signature?: string;
 }
 
 export interface DeleteRoomChatPayload {

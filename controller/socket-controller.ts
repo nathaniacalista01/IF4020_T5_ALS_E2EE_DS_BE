@@ -35,7 +35,7 @@ export const socketController = (io: Server, socket: Socket) => {
   });
 
   socket.on("sendRealTimeMessage", async (payload: SendMessagePayload) => {
-    const { roomId, senderId, receiverId, message } = payload;
+    const { roomId, senderId, receiverId, message, isSigned, signature } = payload;
     console.log("Received real-time message to send:", payload);
 
     if (isNaN(Number(roomId))) {
@@ -44,7 +44,7 @@ export const socketController = (io: Server, socket: Socket) => {
       return;
     }
 
-    const response = await messageService.addMessage(senderId, receiverId, Number(roomId), message);
+    const response = await messageService.addMessage(senderId, receiverId, Number(roomId), message, isSigned, signature);
 
     if (response !== Error.INTERNAL_ERROR) {
       io.to(roomId.toString()).emit("receiveMessage", response);
