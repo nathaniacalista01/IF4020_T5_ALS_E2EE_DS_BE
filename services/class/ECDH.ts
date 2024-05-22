@@ -4,13 +4,18 @@ import { generatePrimeNumber, getRandomNumber } from "../utils/number"
 
 const INFINITY_POINT = new Point(Infinity, Infinity)
 
+type IncrementingPoint = {
+  exponent: number,
+  point: Point
+}
+
 export class ECDH {
   public aVal : number
   public bVal : number
   public pVal : number
   public points : Array<Point>
 
-  // The equation will always be y^2 = x^3 + ax + b
+  // The equation will always be y^2 = (x^3 + ax + b) mod p
   constructor() {
     this.aVal = generatePrimeNumber();
     this.bVal = generatePrimeNumber();
@@ -78,23 +83,53 @@ export class ECDH {
 
     const x = this.calculateCoorX(p1, p2)
     const y = this.calculateCoorY(p1, p2)
-    // if (!this.checkEquation(x,y)){
-    //   console.log("FALSE")
-    //   console.log("x: ", x, "| after mod:", positiveModulo((Math.pow(x, 3) + this.aVal*x + this.bVal), this.pVal))
-    //   console.log("y: ", y, "| after mod:", positiveModulo(Math.pow(y,2), this.pVal))
-    // } else {
-    //   console.log("TRUE")
-    // }
+    if (!this.checkEquation(x,y)){
+      console.log("FALSE")
+      console.log("x: ", x, "| after mod:", positiveModulo((Math.pow(x, 3) + this.aVal*x + this.bVal), this.pVal))
+      console.log("y: ", y, "| after mod:", positiveModulo(Math.pow(y,2), this.pVal))
+    } else {
+      console.log("TRUE")
+    }
     return new Point(x, y)
   }
 
   public multiplyPoint = (p : Point, n : number) : Point => {
+
+    // Construct dictionary
+    const multiplicationDict = Array<IncrementingPoint>()
+    var exp = 1;
+    var idx = 0;
     var tempPoint = new Point(0,0)
     tempPoint.copyPoint(p);
-    for (var i = 0; i < n; i++){
-      tempPoint = this.addPoint(tempPoint, p);
+    while (exp < n){
+      const currentIncrementPoint : IncrementingPoint = {
+        exponent: exp, 
+        point: tempPoint
+      }
+      multiplicationDict.push(currentIncrementPoint)
+      exp *= 2
+      idx += 1
+
+      var newTempPoint = this.addPoint(tempPoint, tempPoint)
+      tempPoint = newTempPoint;
     }
-    return tempPoint
+
+    // Decremental addition
+    // Set idx to the last idx of the list
+    idx = multiplicationDict.length - 1
+    var decrementalN = n
+    var resPoint = INFINITY_POINT
+    while (decrementalN > 0){
+      // Decremental
+      while(multiplicationDict[idx].exponent > decrementalN){
+        idx -=1;
+      }
+
+      const tempIncrementPoint = multiplicationDict[idx]
+      resPoint = this.addPoint(resPoint, tempIncrementPoint.point)
+      decrementalN -= tempIncrementPoint.exponent
+    }
+    return resPoint    
   }
 
   public getRandomPoint = () => {
@@ -111,30 +146,36 @@ export class ECDH {
   }
 }
 
-var temp = new ECDH()
-console.log("a: "+temp.aVal+" b: "+temp.bVal +" p: "+temp.pVal)
-
-var p1 = temp.points[temp.getRandomPoint()]
-
-// console.log("TEMP POINT", p1)
-
-var aPrivKey = generatePrimeNumber();
-var bPrivKey = generatePrimeNumber();
-
-var aPubKey = temp.multiplyPoint(p1, aPrivKey);
-var bPubKey = temp.multiplyPoint(p1, bPrivKey);
-
-console.log("A PUBLIC KEY", aPubKey)
-console.log("B PUBLIC KEY", bPubKey)
-
-var aSharedKey = temp.multiplyPoint(aPubKey, bPrivKey);
-var bSharedKey = temp.multiplyPoint(bPubKey, aPrivKey);
-
-console.log("A SHARED KEY", aSharedKey)
-console.log("B SHARED KEY", bSharedKey)
-
-if (aSharedKey.isSamePoint(bSharedKey)){
-  console.log("BISAAA SAMA AAWOOAWOAWO")
+var incorrectCount = 0
+for (var i = 0; i < 100; i++){
+  var temp = new ECDH()
+  console.log("a: "+temp.aVal+" b: "+temp.bVal +" p: "+temp.pVal)
+  
+  var p1 = temp.points[temp.getRandomPoint()]
+  
+  // console.log("TEMP POINT", p1)
+  
+  var aPrivKey = generatePrimeNumber();
+  var bPrivKey = generatePrimeNumber();
+  
+  var aPubKey = temp.multiplyPoint(p1, aPrivKey);
+  var bPubKey = temp.multiplyPoint(p1, bPrivKey);
+  
+  // console.log("A PUBLIC KEY", aPubKey)
+  // console.log("B PUBLIC KEY", bPubKey)
+  
+  var aSharedKey = temp.multiplyPoint(aPubKey, bPrivKey);
+  var bSharedKey = temp.multiplyPoint(bPubKey, aPrivKey);
+  
+  // console.log("A SHARED KEY", aSharedKey)
+  // console.log("B SHARED KEY", bSharedKey)
+  
+  if (aSharedKey.isSamePoint(bSharedKey)){
+    console.log("BISAAA SAMA AAWOOAWOAWO")
+  } else {
+    incorrectCount +=1
+  }
 }
 
+console.log("The incorrect count:", incorrectCount)
 
