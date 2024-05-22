@@ -11,7 +11,7 @@ export const getRandomNumber = (max : number) => {
   return Math.floor( Math.random() * max)
 }
 
-function isPrime(n: number, k: number = 10): boolean {
+export function isPrime(n: number, k: number = 10): boolean {
   if (n <= 1) return false;
   if (n <= 3) return true;
   if (n % 2 === 0) return false;
@@ -41,7 +41,7 @@ function isPrime(n: number, k: number = 10): boolean {
   return true;
 }
 
-function modExp(base: number, exp: number, mod: number): number {
+export function modExp(base: number, exp: number, mod: number): number {
   let result = 1;
   base = base % mod;
   while (exp > 0) {
