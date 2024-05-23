@@ -1,20 +1,21 @@
 import { Point } from "../type/point"
 
 export const calculateGradient = (p1 :Point, p2: Point, pVal: number) : number | null=>{
-  var m = modInverse(p2.x - p1.x, pVal)
-  if (m){
-    return positiveModulo((p2.y - p1.y) * m, pVal)
+  var modInv = modInverse(p2.x - p1.x, pVal)
+  // console.log("Mod Inverse: ", modInv)
+  if (modInv){
+    return positiveModulo((p2.y - p1.y) * positiveModulo(modInv, pVal), pVal)
   } else {
     console.log("Null Mod Result. P1: (", p1.x, ", ", p1.y,") | P2: (", p2.x,", ", p2.y,")")
     return null
   }
-  
 }
 
 export const calculateGradientHomogenous = (p: Point, aVal : number, pVal: number) : number | null => {
-  var m = modInverse(2 *p.y, pVal)
-  if (m) {
-    return positiveModulo((3*Math.pow(p.x, 2) + aVal) * m, pVal)
+  var modInv = modInverse(2 *p.y, pVal)
+  // console.log("Mod Inverse: ", modInv)
+  if (modInv) {
+    return positiveModulo( positiveModulo(3*Math.pow(p.x, 2) + aVal, pVal) * positiveModulo(modInv, pVal), pVal)
   } else {
     console.log("Null Mod Result. P: (", p.x, ", ", p.y,")")
     return null

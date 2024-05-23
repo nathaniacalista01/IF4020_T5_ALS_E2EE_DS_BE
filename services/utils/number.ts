@@ -2,8 +2,8 @@ import { Point } from "../type/point"
 
 
 // const randomPrime = require('random-prime').randomPrime
-const UPPER_THRESHOLD = 150000
-const LOWER_THRESHOLD = 100000
+const UPPER_THRESHOLD = 10000000
+const LOWER_THRESHOLD = 5000000
 
 export const getRandomNumber = (max : number) => {
   return Math.floor( Math.random() * max)

@@ -51,19 +51,26 @@ export class ECDH {
     return Math.sqrt( (Math.pow(x, 3) + this.aVal*x + this.bVal) % this.pVal);
   }
 
-  public checkEquation = (x: number, y: number) : boolean => {
-    return positiveModulo((Math.pow(x, 3) + this.aVal*x + this.bVal), this.pVal) === positiveModulo(Math.pow(y,2), this.pVal);
+  // public checkEquation = (x: number, y: number) : boolean => {
+  //   const expectedX = positiveModulo( positiveModulo(positiveModulo(x * x, this.pVal) * x, this.pVal) + positiveModulo(this.aVal*x, this.pVal) + positiveModulo(this.bVal, this.pVal) , this.pVal)
+  //   const expectedY = positiveModulo(Math.pow(y,2), this.pVal)
+  //   if (expectedX !== expectedY){
+  //     console.log("FALSE")
+  //     console.log("x: ", x, "| after mod:", expectedX)
+  //     console.log("y: ", y, "| after mod:", expectedY)
+  //   }
+  //   return expectedX === expectedY;
+  // }
+
+  public calculateCoorX = (p1: Point, p2: Point, m: number) => {
+    const res = positiveModulo((positiveModulo(Math.pow(m, 2), this.pVal) - positiveModulo(p1.x, this.pVal) - positiveModulo(p2.x, this.pVal)), this.pVal)
+    return res
   }
 
-  public calculateCoorX = (p1: Point, p2: Point) => {
-    var m = p1.isSamePoint(p2) ? calculateGradientHomogenous(p1, this.aVal, this.pVal) : calculateGradient(p1, p2, this.pVal)
-    return positiveModulo((Math.pow(m!, 2) - p1.x - p2.x), this.pVal)
-  }
-
-  public calculateCoorY = (p1: Point, p2: Point) => {
-    var m = p1.isSamePoint(p2) ? calculateGradientHomogenous(p1, this.aVal, this.pVal) : calculateGradient(p1, p2, this.pVal)
-    const xR = this.calculateCoorX(p1, p2)
-    return positiveModulo((m! * (p1.x - xR) - p1.y), this.pVal)
+  public calculateCoorY = (p1: Point, p2: Point, m: number) => {
+    const xR = this.calculateCoorX(p1, p2, m)
+    const res = positiveModulo(( positiveModulo(m, this.pVal) * positiveModulo(p1.x - xR, this.pVal) - positiveModulo(p1.y, this.pVal)), this.pVal)
+    return res
   }
 
   public addPoint = (p1: Point, p2: Point) => {
@@ -81,15 +88,18 @@ export class ECDH {
       return INFINITY_POINT
     }
 
-    const x = this.calculateCoorX(p1, p2)
-    const y = this.calculateCoorY(p1, p2)
-    if (!this.checkEquation(x,y)){
-      console.log("FALSE")
-      console.log("x: ", x, "| after mod:", positiveModulo((Math.pow(x, 3) + this.aVal*x + this.bVal), this.pVal))
-      console.log("y: ", y, "| after mod:", positiveModulo(Math.pow(y,2), this.pVal))
-    } else {
-      console.log("TRUE")
-    }
+    const m = p1.isSamePoint(p2) ? calculateGradientHomogenous(p1, this.aVal, this.pVal) : calculateGradient(p1, p2, this.pVal)
+    const x = this.calculateCoorX(p1, p2, m!)
+    const y = this.calculateCoorY(p1, p2, m!)
+
+    // if (!this.checkEquation(x,y)){
+    //   console.log("P1", p1)
+    //   console.log("P2", p2)
+    //   console.log("=== BORDER ===")
+    // } 
+    // else {
+    //   console.log("TRUE")
+    // }
     return new Point(x, y)
   }
 
@@ -147,32 +157,32 @@ export class ECDH {
 }
 
 var incorrectCount = 0
-for (var i = 0; i < 100; i++){
+for (var i = 0; i < 30; i++){
   var temp = new ECDH()
   console.log("a: "+temp.aVal+" b: "+temp.bVal +" p: "+temp.pVal)
   
-  var p1 = temp.points[temp.getRandomPoint()]
-  
-  // console.log("TEMP POINT", p1)
+  var basePoint = temp.points[temp.getRandomPoint()]
+  console.log("TEMP POINT", basePoint)
   
   var aPrivKey = generatePrimeNumber();
   var bPrivKey = generatePrimeNumber();
   
-  var aPubKey = temp.multiplyPoint(p1, aPrivKey);
-  var bPubKey = temp.multiplyPoint(p1, bPrivKey);
+  var aPubKey = temp.multiplyPoint(basePoint, aPrivKey);
+  var bPubKey = temp.multiplyPoint(basePoint, bPrivKey);
   
-  // console.log("A PUBLIC KEY", aPubKey)
-  // console.log("B PUBLIC KEY", bPubKey)
+  console.log("A PUBLIC KEY", aPubKey)
+  console.log("B PUBLIC KEY", bPubKey)
   
   var aSharedKey = temp.multiplyPoint(aPubKey, bPrivKey);
   var bSharedKey = temp.multiplyPoint(bPubKey, aPrivKey);
   
-  // console.log("A SHARED KEY", aSharedKey)
-  // console.log("B SHARED KEY", bSharedKey)
+  console.log("A SHARED KEY", aSharedKey)
+  console.log("B SHARED KEY", bSharedKey)
   
   if (aSharedKey.isSamePoint(bSharedKey)){
     console.log("BISAAA SAMA AAWOOAWOAWO")
-  } else {
+  } 
+  else {
     incorrectCount +=1
   }
 }
