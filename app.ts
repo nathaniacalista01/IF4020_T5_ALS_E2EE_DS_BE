@@ -4,6 +4,7 @@ import http from "http";
 import cors from "cors";
 import router from "./routes";
 import { initializeSocket } from "./utils/socket-utils";
+import { initializeSchnorrParams } from "./globals/schnorr";
 dotenv.config();
 
 class App {
@@ -24,7 +25,7 @@ class App {
     this.server.use("/api", router);
 
     this.httpServer = new http.Server(this.server);
-    
+    initializeSchnorrParams();
     initializeSocket(this.httpServer);
   }
 
