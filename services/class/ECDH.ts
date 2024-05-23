@@ -156,36 +156,42 @@ export class ECDH {
   }
 }
 
-var incorrectCount = 0
-for (var i = 0; i < 30; i++){
-  var temp = new ECDH()
-  console.log("a: "+temp.aVal+" b: "+temp.bVal +" p: "+temp.pVal)
+// var incorrectCount = 0
+// for (var i = 0; i < 50; i++){
+//   const temp = new ECDH()
+//   console.log("a: "+temp.aVal+" b: "+temp.bVal +" p: "+temp.pVal)
   
-  var basePoint = temp.points[temp.getRandomPoint()]
-  console.log("TEMP POINT", basePoint)
+//   const basePoint = temp.points[temp.getRandomPoint()]
+//   console.log("TEMP POINT", basePoint)
   
-  var aPrivKey = generatePrimeNumber();
-  var bPrivKey = generatePrimeNumber();
+//   const aPrivKey = generatePrimeNumber();
+//   const bPrivKey = generatePrimeNumber();
   
-  var aPubKey = temp.multiplyPoint(basePoint, aPrivKey);
-  var bPubKey = temp.multiplyPoint(basePoint, bPrivKey);
+//   const aPubKey = temp.multiplyPoint(basePoint, aPrivKey);
+//   const bPubKey = temp.multiplyPoint(basePoint, bPrivKey);
   
-  console.log("A PUBLIC KEY", aPubKey)
-  console.log("B PUBLIC KEY", bPubKey)
+//   console.log("A PUBLIC KEY", aPubKey)
+//   console.log("B PUBLIC KEY", bPubKey)
   
-  var aSharedKey = temp.multiplyPoint(aPubKey, bPrivKey);
-  var bSharedKey = temp.multiplyPoint(bPubKey, aPrivKey);
+//   const aSharedKey = temp.multiplyPoint(aPubKey, bPrivKey);
+//   const bSharedKey = temp.multiplyPoint(bPubKey, aPrivKey);
   
-  console.log("A SHARED KEY", aSharedKey)
-  console.log("B SHARED KEY", bSharedKey)
-  
-  if (aSharedKey.isSamePoint(bSharedKey)){
-    console.log("BISAAA SAMA AAWOOAWOAWO")
-  } 
-  else {
-    incorrectCount +=1
-  }
-}
+//   console.log("A SHARED KEY", aSharedKey)
+//   console.log("B SHARED KEY", bSharedKey)
 
-console.log("The incorrect count:", incorrectCount)
+//   const aSharedKeyVal = aSharedKey.getPointValue().toString(16);
+//   const bSharedKeyVal = bSharedKey.getPointValue().toString(16);
+
+//   console.log("A SHARED KEY VAL", aSharedKeyVal)
+//   console.log("B SHARED KEY VAL", bSharedKeyVal)
+  
+//   if (aSharedKeyVal == bSharedKeyVal){
+//     console.log("BISAAA SAMA AAWOOAWOAWO")
+//   } 
+//   else {
+//     incorrectCount +=1
+//   }
+// }
+
+// console.log("The incorrect count:", incorrectCount)
 

@@ -26,4 +26,8 @@ export class Point {
     return this.x === p.x && this.y === Math.abs(pVal -p.y)
   }
 
+  getPointValue = () => {
+    return this.x * this.y
+  }
+
 }
