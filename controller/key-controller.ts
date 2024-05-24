@@ -7,6 +7,7 @@ export const keyRouter = express.Router()
 keyRouter.post('/', async (req: Request, res: Response) => {
   const clientPort = req.connection.localPort
   const clientPublicKey = req.body.key
+  const clientECCData = req.body.eccData
   if (!clientPort) {
     res.status(505).send('Client port not found!')
     return
@@ -15,8 +16,9 @@ keyRouter.post('/', async (req: Request, res: Response) => {
     console.log('Key already exist!')
     res.status(201).send('Key already exists')
     return
-  } else {
-    const serverPublicKey = generateSharedKey(clientPort, clientPublicKey)
+  } 
+  else {
+    const serverPublicKey = generateSharedKey(clientPort, clientPublicKey, clientECCData)
     res.status(200).send(serverPublicKey)
     return
   }

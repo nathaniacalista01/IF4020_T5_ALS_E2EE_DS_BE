@@ -28,7 +28,8 @@ export const decryptionMiddleware = (
   }
 
   try {
-    const key = clientKeys.get(clientPort).toString('hex')
+    console.log(clientKeys)
+    const key = clientKeys.get(clientPort)
     const encryptedData = req.body.encrypted
     const newkey = makeStringToBlocksArray(key, true)[0]
     const decryptedBody = decryptECB(

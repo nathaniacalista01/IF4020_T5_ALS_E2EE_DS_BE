@@ -1,3 +1,4 @@
+import { eccBase } from "../type/eccBase";
 import { Point } from "../type/point";
 import { calculateGradient, calculateGradientHomogenous, isSquare, makeHexToNum, positiveModulo } from "../utils/functions";
 import { generatePrimeNumber, getRandomNumber } from "../utils/number"
@@ -14,7 +15,7 @@ export class ECDH {
   public bVal : number
   public pVal : number
   public points : Array<Point>
-  public basePoint: Point
+  public basePoint : Point
 
   // The equation will always be y^2 = (x^3 + ax + b) mod p
   constructor() {
@@ -48,10 +49,17 @@ export class ECDH {
     }
   }
 
+
   public setValue = (a: number, b: number, p : number) => {
     this.aVal = a;
     this.bVal = b;
     this.pVal = p;
+    this.calculatePoints()
+  }
+
+  public getValue = () => {
+    const data : eccBase = {a: this.aVal, b: this.bVal, p: this.pVal, pointVal: this.basePoint.getPointValue()}
+    return data
   }
 
   public setBasePoint = (p: Point) => {
@@ -61,17 +69,6 @@ export class ECDH {
   public calculateY = (x: number) : number => {
     return Math.sqrt( (Math.pow(x, 3) + this.aVal*x + this.bVal) % this.pVal);
   }
-
-  // public checkEquation = (x: number, y: number) : boolean => {
-  //   const expectedX = positiveModulo( positiveModulo(positiveModulo(x * x, this.pVal) * x, this.pVal) + positiveModulo(this.aVal*x, this.pVal) + positiveModulo(this.bVal, this.pVal) , this.pVal)
-  //   const expectedY = positiveModulo(Math.pow(y,2), this.pVal)
-  //   if (expectedX !== expectedY){
-  //     console.log("FALSE")
-  //     console.log("x: ", x, "| after mod:", expectedX)
-  //     console.log("y: ", y, "| after mod:", expectedY)
-  //   }
-  //   return expectedX === expectedY;
-  // }
 
   public calculateCoorX = (p1: Point, p2: Point, m: number) => {
     const res = positiveModulo((positiveModulo(Math.pow(m, 2), this.pVal) - positiveModulo(p1.x, this.pVal) - positiveModulo(p2.x, this.pVal)), this.pVal)
@@ -86,7 +83,6 @@ export class ECDH {
 
   public addPoint = (p1: Point, p2: Point) => {
 
-    
     // Handle cases
     if (p1.isInverse(p2, this.pVal)){
       return INFINITY_POINT
@@ -124,9 +120,9 @@ export class ECDH {
 
     // Construct dictionary
     const multiplicationDict = Array<IncrementingPoint>()
-    var exp = 1;
-    var idx = 0;
-    var tempPoint = new Point(0,0)
+    let exp = 1;
+    let idx = 0;
+    let tempPoint = new Point(0,0)
     tempPoint.copyPoint(p);
     while (exp < n){
       const currentIncrementPoint : IncrementingPoint = {
@@ -137,15 +133,15 @@ export class ECDH {
       exp *= 2
       idx += 1
 
-      var newTempPoint = this.addPoint(tempPoint, tempPoint)
+      const newTempPoint = this.addPoint(tempPoint, tempPoint)
       tempPoint = newTempPoint;
     }
 
     // Decremental addition
     // Set idx to the last idx of the list
     idx = multiplicationDict.length - 1
-    var decrementalN = n
-    var resPoint = INFINITY_POINT
+    let decrementalN = n
+    let resPoint = INFINITY_POINT
     while (decrementalN > 0){
       // Decremental
       while(multiplicationDict[idx].exponent > decrementalN){
@@ -161,7 +157,8 @@ export class ECDH {
 
   public getRandomPoint = () => {
     this.basePoint = this.points[Math.floor(Math.random() * this.points.length)]
-    return this.basePoint
+    const temp = new Point(this.basePoint.x, this.basePoint.y)
+    return temp
   }
 
   public searchPoint = (p : Point) : Point | null => {
@@ -173,6 +170,7 @@ export class ECDH {
     return null
   }
 }
+
 
 // var incorrectCount = 0
 // for (var i = 0; i < 50; i++){
