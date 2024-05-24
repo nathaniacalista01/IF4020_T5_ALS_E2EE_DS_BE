@@ -1,14 +1,16 @@
-import { JNN } from './jnn'
+import { operatorXOR } from './calculate'
+// import { JNN } from './jnn'
 
 export const encryptECB = (
   arrBlocks: Array<string>,
   key: string,
 ): Array<string> => {
   const res: Array<string> = []
-  const jnn = new JNN()
+  // const jnn = new JNN()
   for (let i = 0; i < arrBlocks.length; i++) {
     const currentBlock = arrBlocks[i]
-    const encryptedBlock = jnn.encrypt(currentBlock, key)
+    // const encryptedBlock = jnn.encrypt(currentBlock, key)
+    const encryptedBlock = operatorXOR(currentBlock, key)
     res.push(encryptedBlock)
   }
 
@@ -20,11 +22,12 @@ export const decryptECB = (
   key: string,
 ): Array<string> => {
   const res: Array<string> = []
-  const jnn = new JNN()
+  // const jnn = new JNN()
 
   for (let i = 0; i < arrBlocks.length; i++) {
     const currentBlock = arrBlocks[i]
-    const decryptedBlock = jnn.decrypt(currentBlock, key)
+    // const decryptedBlock = jnn.decrypt(currentBlock, key)
+    const decryptedBlock = operatorXOR(currentBlock, key)
     res.push(decryptedBlock)
   }
 
