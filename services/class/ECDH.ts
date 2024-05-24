@@ -1,5 +1,5 @@
 import { Point } from "../type/point";
-import { calculateGradient, calculateGradientHomogenous, isSquare, positiveModulo } from "../utils/functions";
+import { calculateGradient, calculateGradientHomogenous, isSquare, makeHexToNum, positiveModulo } from "../utils/functions";
 import { generatePrimeNumber, getRandomNumber } from "../utils/number"
 
 const INFINITY_POINT = new Point(Infinity, Infinity)
@@ -14,6 +14,7 @@ export class ECDH {
   public bVal : number
   public pVal : number
   public points : Array<Point>
+  public basePoint: Point
 
   // The equation will always be y^2 = (x^3 + ax + b) mod p
   constructor() {
@@ -21,19 +22,25 @@ export class ECDH {
     this.bVal = generatePrimeNumber();
     this.pVal = generatePrimeNumber();
     this.points = []
+    this.basePoint = new Point(0,0)
+    this.calculatePoints();
+  }
+
+  public calculatePoints = () => {
+    this.points = []
 
     // Check the requirements
-    var check = 4*Math.pow(this.aVal, 3) + 27*Math.pow(this.bVal, 2)
+    let check = 4*Math.pow(this.aVal, 3) + 27*Math.pow(this.bVal, 2)
     while (check == 0){
       this.aVal = generatePrimeNumber();
       this.bVal = generatePrimeNumber();
       check = 4*Math.pow(this.aVal, 3) + 27*Math.pow(this.bVal, 2)
     }
 
-    for( var i = 0; i < this.pVal-1; i++){
-      var res = this.calculateY(i);
-      var selection1 = res % 1 == 0 // the value should be an integer
-      var selection2 = (res > 0 && res < this.pVal) // [1...pVal-1]
+    for( let i = 0; i < this.pVal-1; i++){
+      const res = this.calculateY(i);
+      const selection1 = res % 1 == 0 // the value should be an integer
+      const selection2 = (res > 0 && res < this.pVal) // [1...pVal-1]
       if (selection1 && selection2){
         this.points.push(new Point(i, res))
         this.points.push(new Point(i, this.pVal - res))
@@ -45,6 +52,10 @@ export class ECDH {
     this.aVal = a;
     this.bVal = b;
     this.pVal = p;
+  }
+
+  public setBasePoint = (p: Point) => {
+    this.basePoint = p;
   }
 
   public calculateY = (x: number) : number => {
@@ -75,6 +86,7 @@ export class ECDH {
 
   public addPoint = (p1: Point, p2: Point) => {
 
+    
     // Handle cases
     if (p1.isInverse(p2, this.pVal)){
       return INFINITY_POINT
@@ -103,7 +115,12 @@ export class ECDH {
     return new Point(x, y)
   }
 
-  public multiplyPoint = (p : Point, n : number) : Point => {
+  public multiplyPoint = (p : Point, n : number | string) : Point => {
+
+    // n can be number or hexadecimal
+    if (typeof n === 'string') {
+      n = makeHexToNum(n);
+    }
 
     // Construct dictionary
     const multiplicationDict = Array<IncrementingPoint>()
@@ -143,7 +160,8 @@ export class ECDH {
   }
 
   public getRandomPoint = () => {
-    return Math.floor(Math.random() * this.points.length)
+    this.basePoint = this.points[Math.floor(Math.random() * this.points.length)]
+    return this.basePoint
   }
 
   public searchPoint = (p : Point) : Point | null => {
@@ -158,32 +176,36 @@ export class ECDH {
 
 // var incorrectCount = 0
 // for (var i = 0; i < 50; i++){
-//   const temp = new ECDH()
-//   console.log("a: "+temp.aVal+" b: "+temp.bVal +" p: "+temp.pVal)
+  // const temp = new ECDH()
+  // console.log("a: "+temp.aVal+" b: "+temp.bVal +" p: "+temp.pVal)
   
-//   const basePoint = temp.points[temp.getRandomPoint()]
-//   console.log("TEMP POINT", basePoint)
+  // const basePoint = temp.getRandomPoint()
+  // console.log("TEMP POINT", basePoint)
   
-//   const aPrivKey = generatePrimeNumber();
-//   const bPrivKey = generatePrimeNumber();
+  // const aPrivKey = generatePrimeNumber();
+  // const bPrivKey = generatePrimeNumber();
   
-//   const aPubKey = temp.multiplyPoint(basePoint, aPrivKey);
-//   const bPubKey = temp.multiplyPoint(basePoint, bPrivKey);
+  // const aPubKey = temp.multiplyPoint(basePoint, aPrivKey);
+  // const bPubKey = temp.multiplyPoint(basePoint, bPrivKey);
   
-//   console.log("A PUBLIC KEY", aPubKey)
-//   console.log("B PUBLIC KEY", bPubKey)
+  // console.log("A PUBLIC KEY", aPubKey)
+  // console.log("B PUBLIC KEY", bPubKey)
   
-//   const aSharedKey = temp.multiplyPoint(aPubKey, bPrivKey);
-//   const bSharedKey = temp.multiplyPoint(bPubKey, aPrivKey);
+  // const aSharedKey = temp.multiplyPoint(aPubKey, bPrivKey);
+  // const bSharedKey = temp.multiplyPoint(bPubKey, aPrivKey);
   
-//   console.log("A SHARED KEY", aSharedKey)
-//   console.log("B SHARED KEY", bSharedKey)
+  // console.log("A SHARED KEY", aSharedKey)
+  // console.log("B SHARED KEY", bSharedKey)
 
-//   const aSharedKeyVal = aSharedKey.getPointValue().toString(16);
-//   const bSharedKeyVal = bSharedKey.getPointValue().toString(16);
+  // const aSharedKeyVal = aSharedKey.getPointValue();
+  // const bSharedKeyVal = bSharedKey.getPointValue();
 
-//   console.log("A SHARED KEY VAL", aSharedKeyVal)
-//   console.log("B SHARED KEY VAL", bSharedKeyVal)
+  // console.log("A SHARED KEY VAL", aSharedKeyVal)
+  // console.log("B SHARED KEY VAL", bSharedKeyVal)
+
+  // const test = new Point(0,0)
+  // test.setPointValue(aSharedKeyVal)
+  // console.log(test)
   
 //   if (aSharedKeyVal == bSharedKeyVal){
 //     console.log("BISAAA SAMA AAWOOAWOAWO")

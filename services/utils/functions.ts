@@ -76,3 +76,11 @@ export const isPointInList = (arr: Array<Point>, p : Point) => {
   })
   return false
 }
+
+export const makeNumToHex = (num: number) : string => {
+  return num.toString(16);
+}
+
+export const makeHexToNum = (hex: string) : number => {
+  return parseInt(hex, 16);
+}
