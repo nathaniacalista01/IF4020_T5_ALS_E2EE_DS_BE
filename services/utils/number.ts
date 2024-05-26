@@ -5,6 +5,9 @@ import { Point } from "../type/point"
 const UPPER_THRESHOLD = 5000000
 const LOWER_THRESHOLD = 2500000
 
+const UPPER_SMALLER_THRESHOLD = 500000
+const LOWER_SMALLER_THRESHOLD = 250000
+
 export const getRandomNumber = (max : number) => {
   return Math.floor( Math.random() * max)
 }
@@ -56,6 +59,15 @@ export function generatePrimeNumber(): number {
       if (isPrime(n)) {
           return n;
       }
+  }
+}
+
+export function generateSmallerPrimeNumber() : number {
+  while (true) {
+    const n = Math.floor(Math.random() * (LOWER_SMALLER_THRESHOLD - UPPER_SMALLER_THRESHOLD + 1)) + UPPER_SMALLER_THRESHOLD;
+    if (isPrime(n)) {
+        return n;
+    }
   }
 }
 

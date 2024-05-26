@@ -5,6 +5,7 @@ export interface SendMessagePayload {
     message: string;
     isSigned: boolean;
     signature?: string;
+    ecegVal: string;
 }
 
 export interface DeleteRoomChatPayload {

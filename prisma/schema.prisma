@@ -36,6 +36,7 @@ model Message{
   receiver      User @relation("receiver", fields: [receiverId], references: [id])
   isSigned      Boolean   @default(false)
   signature     String?
+  ecegVal       String    @default("")
 }
 
 model RoomChat{
