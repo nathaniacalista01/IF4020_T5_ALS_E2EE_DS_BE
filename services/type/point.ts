@@ -41,4 +41,8 @@ export class Point {
     this.y = makeHexToNum(yHex)
   }
 
+  changeToInverse = () => {
+    this.y *= -1
+  }
+
 }
