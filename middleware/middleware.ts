@@ -54,6 +54,7 @@ export const encryptionMiddleware = (
 
   res.send = function (data) {
     const clientPort = req.connection.localPort
+    // console.log(clientPort)
     if (!clientKeys.has(clientPort)) {
       return originalSend.call(
         this,
@@ -62,7 +63,8 @@ export const encryptionMiddleware = (
     }
 
     try {
-      const key = clientKeys.get(clientPort).toString('hex')
+      // const key = clientKeys.get(clientPort).toString('hex')
+      const key = clientKeys.get(clientPort)
       const keyBlocks = makeStringToBlocksArray(key, true)[0]
 
       const stringData = typeof data === 'string' ? data : JSON.stringify(data)

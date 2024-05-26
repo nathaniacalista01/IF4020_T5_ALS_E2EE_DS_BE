@@ -19,6 +19,7 @@ keyRouter.post('/', async (req: Request, res: Response) => {
   } 
   else {
     const serverPublicKey = generateSharedKey(clientPort, clientPublicKey, clientECCData)
+    console.log(clientKeys)
     res.status(200).send(serverPublicKey)
     return
   }
