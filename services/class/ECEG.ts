@@ -15,6 +15,11 @@ type PairPoint = {
   p2: Point
 }
 
+export type PairPointValue = {
+  p1Val : string,
+  p2Val : string
+}
+
 export class ECEG {
   public aVal : number
   public bVal : number
@@ -177,10 +182,9 @@ export class ECEG {
 
   public encryptECEG = (k: number, basePoint: Point, secretPoint: Point, publicKey: Point) : PairPoint => {
     const kPb = this.multiplyPoint(publicKey, k)
-    console.log("kPb", kPb)
     const resPairPoint : PairPoint = {
       p1: this.multiplyPoint(basePoint, k),
-      p2: this.addPoint(secretPoint, this.multiplyPoint(publicKey, k))
+      p2: this.addPoint(secretPoint, kPb)
     }
     return resPairPoint
   }
@@ -189,10 +193,53 @@ export class ECEG {
     const p1 = pairPoint.p1
     const p2 = pairPoint.p2
     const bkB = this.multiplyPoint(p1, privateKey)
-    console.log("bkB", bkB)
     return this.minusPoint(p2, bkB)
   }
+
+  public getValueFromPairPoint = (pairPoint : PairPoint) => {
+    const pairPointVal : PairPointValue = {
+      p1Val : pairPoint.p1.getPointValue(),
+      p2Val : pairPoint.p2.getPointValue()
+    }
+    return pairPointVal
+  }
+
+  public getPointFromPairPointValue = (pairPointVal : PairPointValue)  => {
+    const p1 = new Point(0,0)
+    p1.setPointValue(pairPointVal.p1Val)
+    const p2 = new Point(0,0)
+    p2.setPointValue(pairPointVal.p2Val)
+    
+    const pairPoint : PairPoint = {
+      p1 : p1,
+      p2 : p2
+    }
+    return pairPoint
+  }
+
+  public makePairPointValueToString = (pairPointVal : PairPointValue) => {
+    return pairPointVal.p1Val + pairPointVal.p2Val
+  }
+
+  public makeStringToPairPointValue = (val : string) => {
+    const p1Val = val.slice(0, 16)
+    const p2Val = val.slice(16,32)
+    const pairPointVal : PairPointValue = {
+      p1Val: p1Val,
+      p2Val: p2Val
+    }
+    return pairPointVal
+  }
+
+  public getKValue = () => {
+    let k = generatePrimeNumber()
+    while ( k < 1 || k > this.pVal-1) {
+      k = generatePrimeNumber()
+    }
+    return k
+  }
 }
+
 
 
 // var incorrectCount = 0
